@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinitikan - Gallery</title>
+    <script src="components.js"></script>
+    <script src="data.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            color: white;
+            background: black;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 3rem;
+            }
+        }
+
+        /* Gallery Header */
+        .gallery-header {
+            padding-top: 4rem;
+            padding-bottom: 3rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-header {
+                padding-top: 6rem;
+                padding-bottom: 5rem;
+            }
+        }
+
+        .gallery-header h1 {
+            font-family: serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .gallery-header p {
+            color: #a1a1aa;
+            max-width: 32rem;
+            margin: 0 auto;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            padding: 0 1rem;
+        }
+
+        /* Category Filters */
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 9999px;
+            border: none;
+            background: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            color: white;
+        }
+
+        .category-btn.active {
+            background: white;
+            color: black;
+        }
+
+        /* Masonry Grid */
+        .masonry-grid {
+            display: grid;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .masonry-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                padding: 0;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        .photo-item {
+            margin-bottom: 0;
+        }
+
+        .photo-link {
+            display: block;
+        }
+
+        .photo-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            aspect-ratio: 3/4;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .photo-link:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+        }
+
+        .photo-link:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .photo-info h3 {
+            color: white;
+            font-family: serif;
+            font-size: clamp(1rem, 2vw, 1.125rem);
+        }
+
+        .photo-info p {
+            color: #d4d4d8;
+            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+        }
+
+        /* Fade In Animation */
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <main>
+        <div class="container">
+            <div class="gallery-header">
+                <h1>Portrait Gallery</h1>
+                <p>Explore my collection of portrait photography that captures the essence, emotion, and unique character of each subject.</p>
+            </div>
+
+            <!-- Photo Grid -->
+            <div class="masonry-grid" id="photoGrid"></div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        // Initialize gallery
+        const photoGrid = document.getElementById('photoGrid');
+
+        // Display photos
+        function displayPhotos() {
+            // Clear existing grid
+            photoGrid.innerHTML = '';
+
+            // Create columns based on screen size
+            const columnCount = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+            const columns = Array.from({ length: columnCount }, () => {
+                const column = document.createElement('div');
+                column.className = 'masonry-column';
+                return column;
+            });
+
+            // Add columns to grid
+            columns.forEach(column => photoGrid.appendChild(column));
+
+            // Distribute photos across columns
+            photos.forEach((photo, index) => {
+                const column = columns[index % columnCount];
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item fade-in';
+                photoItem.innerHTML = `
+                    <a href="/gallery/${photo.id}" class="photo-link">
+                        <div class="photo-container">
+                            <img src="${photo.imageUrl}?auto=format&fit=crop&w=600" alt="${photo.title}">
+                            <div class="photo-overlay">
+                                <div class="photo-info">
+                                    <h3>${photo.title}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                column.appendChild(photoItem);
+            });
+        }
+
+        // Initial load
+        displayPhotos();
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(displayPhotos, 250);
+        });
+    </script>
+</body>
+</html> 
